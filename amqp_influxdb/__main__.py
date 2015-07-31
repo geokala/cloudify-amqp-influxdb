@@ -27,6 +27,10 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--amqp-hostname', required=False,
                         default='localhost')
+    parser.add_argument('--amqp-username', required=False,
+                        default='guest')
+    parser.add_argument('--amqp-password', required=False,
+                        default='guest')
     parser.add_argument('--amqp-exchange', required=True)
     parser.add_argument('--amqp-routing-key', required=True)
     parser.add_argument('--influx-hostname', required=False,
@@ -50,7 +54,11 @@ def main():
     conn_params = {
         'host': args.amqp_hostname,
         'connection_attempts': 12,
-        'retry_delay': 5
+        'retry_delay': 5,
+        'credentials': {
+            'username': args.amqp_username,
+            'password': args.amqp_password,
+        },
     }
     consumer = AMQPTopicConsumer(
         exchange=args.amqp_exchange,
