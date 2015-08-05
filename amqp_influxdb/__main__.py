@@ -27,12 +27,16 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--amqp-hostname', required=False,
                         default='localhost')
+    parser.add_argument('--amqp-port', required=False,
+                        type=int, default=5672)
     parser.add_argument('--amqp-username', required=False,
                         default='guest')
     parser.add_argument('--amqp-password', required=False,
                         default='guest')
     parser.add_argument('--amqp-exchange', required=True)
     parser.add_argument('--amqp-routing-key', required=True)
+    parser.add_argument('--amqp-ca-cert', required=False,
+                        default='')
     parser.add_argument('--influx-hostname', required=False,
                         default='localhost')
     parser.add_argument('--influx-database', required=True)
@@ -53,6 +57,7 @@ def main():
 
     conn_params = {
         'host': args.amqp_hostname,
+        'port': args.amqp_port,
         'connection_attempts': 12,
         'retry_delay': 5,
         'credentials': {
@@ -60,6 +65,10 @@ def main():
             'password': args.amqp_password,
         },
     }
+    if args.amqp_ca_cert != '':
+        conn_params['ssl_options'] = {
+            'ca_certs': args.amqp_ca_cert,
+        }
     consumer = AMQPTopicConsumer(
         exchange=args.amqp_exchange,
         routing_key=args.amqp_routing_key,
