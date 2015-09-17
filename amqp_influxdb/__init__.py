@@ -21,6 +21,7 @@ import time
 import requests
 import pika
 from pika.exceptions import AMQPConnectionError
+import ssl
 
 
 D_CONN_ATTEMPTS = 12
@@ -51,6 +52,16 @@ class AMQPTopicConsumer(object):
                 password=credentials['password'],
             )
             connection_parameters['credentials'] = credentials_object
+
+        if connection_parameters['ca_path'] != '':
+            connection_parameters['ssl'] = True
+            connection_parameters['ssl_options'] = {
+                'cert_reqs': ssl.CERT_REQUIRED,
+                'ca_certs': connection_parameters['ca_path'],
+            }
+
+        # No matter what, we don't need this any more
+        connection_parameters.pop('ca_path')
 
         # add retry with try/catch because Pika currently ignoring these
         # connection parameters when using BlockingConnection:

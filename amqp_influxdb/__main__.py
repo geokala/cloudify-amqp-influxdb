@@ -27,10 +27,14 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--amqp-hostname', required=False,
                         default='localhost')
+    parser.add_argument('--amqp-port', required=False,
+                        default='')
     parser.add_argument('--amqp-username', required=False,
                         default='testuser')
     parser.add_argument('--amqp-password', required=False,
                         default='testpass')
+    parser.add_argument('--amqp-ca-cert-path', required=False,
+                        default='')
     parser.add_argument('--amqp-exchange', required=True)
     parser.add_argument('--amqp-routing-key', required=True)
     parser.add_argument('--influx-hostname', required=False,
@@ -51,14 +55,24 @@ def main():
         batch_size=args.influx_batch_size,
         max_batch_delay=args.influx_max_batch_delay)
 
+    if args.amqp_port != '':
+        amqp_port = args.amqp_port
+    else:
+        if args.amqp_ca_cert_path != '':
+            amqp_port = 5671
+        else:
+            amqp_port = 5672
+
     conn_params = {
         'host': args.amqp_hostname,
+        'port': amqp_port,
         'connection_attempts': 12,
         'retry_delay': 5,
         'credentials': {
             'username': args.amqp_username,
             'password': args.amqp_password,
         },
+        'ca_path': args.amqp_ca_cert_path,
     }
     consumer = AMQPTopicConsumer(
         exchange=args.amqp_exchange,
