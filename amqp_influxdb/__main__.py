@@ -34,7 +34,8 @@ def parse_args():
                         default='guest')
     parser.add_argument('--amqp-password', required=False,
                         default='guest')
-    parser.add_argument('--amqp-ssl-enabled', required=False)
+    parser.add_argument('--amqp-ssl-enabled', required=False,
+                        default='false')
     parser.add_argument('--amqp-ca-cert-path', required=False,
                         default='')
     parser.add_argument('--amqp-exchange', required=True)
